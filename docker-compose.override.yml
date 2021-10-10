@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  mongodb:
+    container_name: mongodb
+    restart: always
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/site:/data/db
+    ports:
+      - "27017:27017"
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis
+    command: --port 6379
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - type: volume
+        target: /data
+    restart: always
+  netcoremrd.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=mongodb://mongodb:27017"
+    depends_on: 
+      - mongodb
+    ports:
+       - "5000:80"
